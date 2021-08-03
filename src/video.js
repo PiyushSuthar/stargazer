@@ -6,7 +6,16 @@ import { Img } from "remotion";
 const W = 1280 / 2.5;
 const H = 720 / 2.5;
 
-export function Video({ repoOrg, repoName, starCount, stargazers }) {
+/**
+ * @typedef {{avatarUrl: string,name: string}} stargazer
+ */
+
+/**
+ * 
+ * @param {{stargazers: 
+ * {user: { avatarUrl: string; name: string; login: string;},     allStargazers: stargazer[]; }}} some  
+ */
+export function Video({ username, repoName, starCount, stargazers }) {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
 
@@ -15,21 +24,24 @@ export function Video({ repoOrg, repoName, starCount, stargazers }) {
   const progress = useProgress(
     frame,
     durationInFrames - extraEnding,
-    stargazers.length,
+    stargazers.allStargazers.length,
     fps
   );
 
   return (
     <Content
-      stargazers={stargazers}
-      repoOrg={repoOrg}
-      repoName={repoName}
+      stargazers={stargazers.allStargazers}
+      username={username}
+      repoName={stargazers.user}
       progress={progress}
     />
   );
 }
 
-function Content({ stargazers, repoOrg, repoName, progress }) {
+/**
+ * @param {{stargazers: stargazer[]}} some
+ */
+function Content({ stargazers, username, repoName, progress }) {
   const gap = 102;
   const startY = 76 - gap;
   const dy = progress * gap;
@@ -57,8 +69,7 @@ function Content({ stargazers, repoOrg, repoName, progress }) {
           <StarBox
             avatarUrl={stargazer.avatarUrl}
             name={stargazer.name}
-            date={stargazer.date}
-            repoName={repoName}
+            repoName={repoName.name}
             y={startY - gap * index + dy}
             grow={grow}
             opacity={opacity}
@@ -68,7 +79,7 @@ function Content({ stargazers, repoOrg, repoName, progress }) {
         );
       })}
 
-      <RepoHeader stars={Math.round(progress)} org={repoOrg} name={repoName} />
+      <RepoHeader stars={Math.round(progress)} login={repoName.login} avatarUrl={repoName.avatarUrl} name={repoName.name} />
     </div>
   );
 }
@@ -76,20 +87,12 @@ function Content({ stargazers, repoOrg, repoName, progress }) {
 function StarBox({
   avatarUrl,
   name,
-  date,
   repoName,
   y,
   starNumber,
   grow,
   opacity,
 }) {
-  const d = new Date(date);
-  const dateString = d.toLocaleDateString("en-US", {
-    month: "short",
-    day: "2-digit",
-    year: "numeric",
-  });
-
   return (
     <div
       style={{
@@ -141,8 +144,8 @@ function StarBox({
             whiteSpace: "nowrap",
           }}
         >
-          starred <b>{repoName}</b>{" "}
-          <span style={{ color: "#586069" }}>on {dateString}</span>
+          Followed <b>{repoName}</b>{" "}
+          <span style={{ color: "#586069" }}>on someday.</span>
         </div>
       </div>
       <div
@@ -155,7 +158,7 @@ function StarBox({
           alignItems: "center",
         }}
       >
-        <span style={{ fontSize: "0.8em", color: "#586069" }}>Star</span>
+        <span style={{ fontSize: "0.8em", color: "#586069" }}>Follower</span>
         <div style={{ fontSize: "1.2em" }}>
           <span style={{ fontSize: "1em", color: "#586069" }}>#</span>
           {starNumber}

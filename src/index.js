@@ -11,20 +11,22 @@ import { fetchStargazers } from "./fetch";
 const FPS = 30;
 
 const defaultProps = {
-  repoOrg: "code-hike",
-  repoName: "codehike",
-  starCount: 100,
+  username: "PiyushSuthar",
+  starCount: 109,
   duration: 15,
 };
 const inputProps = { ...defaultProps, ...getInputProps() };
 
 function RemotionVideo() {
   const [handle] = React.useState(() => delayRender());
-  const [stargazers, setStargazers] = React.useState([]);
+  const [stargazers, setStargazers] = React.useState({
+    allStargazers: [],
+    user: {}
+  });
 
   React.useEffect(() => {
-    const { repoOrg, repoName, starCount } = inputProps;
-    fetchStargazers(repoOrg, repoName, starCount).then((stargazers) => {
+    const { username, starCount } = inputProps;
+    fetchStargazers(username, starCount).then((stargazers) => {
       setStargazers(stargazers);
       continueRender(handle);
     });
